@@ -17,55 +17,15 @@
 * If not, see <http://www.gnu.org/licenses/>.
 **/
 
-/**
-* Headers
-**/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <limits.h>
-#include <assert.h>
-#include <stdbool.h>
-
-
-
+#include "fast_primes_ll.h"
 
 #define NAME    "fast_primes_ll"
-#define VERSION "1.0"
+#define VERSION "1.1"
 #define AUTHOR  "Toni Helminen"
-#define BITBOARD unsigned long long
-#define MAX_TOKENS 128
-
-/**
-* Macros
-**/
-
-#define INT(a) ((int) (a))
-#define DOUBLE(f) ((double) (f))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define ULL(a) ((BITBOARD) (a))
-#define FCP_ASSERT(test) if ( ! (test)) {P("fast_primes_ll Error: Line: %i", __LINE__); exit(0);}
-
-static bool Token_ok();
-static void Token_reset();
-static void Token_add(const char *s);
-static void P(const char *format, ...);
-static void Print_primes(const int usize);
-static bool User_is_prime(const int prime);
-static void Add_prime(const int prime);
-static int Next_prime();
-static void Init_primes();
-static void Bench();
-static void Insert_primes(const int usize);
+#define HASH_SIZE 64 /* MB / Starting size */
 
 typedef struct {
-  BITBOARD *primes;
+  int *primes;
   BITBOARD size;
   int primes_n;
   int count;
@@ -73,7 +33,7 @@ typedef struct {
   int key;
 } HASHTABLE_T;
 
-static char TOKENS[MAX_TOKENS][256] = {{0}}; // too plenty?
+static char TOKENS[MAX_TOKENS][256] = {{0}};
 static int TOKENS_N = 0;
 static int TOKENS_I = 0;
 static HASHTABLE_T HASH = {0};
@@ -92,7 +52,6 @@ static bool Equal_strings(const char *a, const char *b)
 {
   return strcmp(a, b) ? 0 : 1;
 }
-
 
 static BITBOARD Now()
 {
@@ -152,7 +111,7 @@ static bool Token_is(const char *s)
 static void Token_expect(const char *s)
 {
   if ( ! Token_is(s)) {
-    P("Error: Unexpected Token: '%s'", Token_current());
+    P("{ Error: Unexpected Token: '%s' }", Token_current());
     exit(0);
   }
   Token_pop();
@@ -208,7 +167,7 @@ static void Hashtable_set_size(const int usize /* MB */)
     HASH.key <<= 1;
   HASH.key >>= 1;
   HASH.key -= 1; // 1000b = 8d / - 1d / 0111b = 7d
-  HASH.primes = (BITBOARD*) calloc(HASH.count, sizeof(BITBOARD)); // <- Cast for g++
+  HASH.primes = (int*) calloc(HASH.count, sizeof(int)); // <- Cast for g++
   FCP_ASSERT(HASH.primes != NULL) // Make sure there is enough space
   Init_primes();
 }
@@ -216,16 +175,16 @@ static void Hashtable_set_size(const int usize /* MB */)
 static void Hashtable_make_bigger()
 {
   HASH.count = 2 * HASH.count;
-  HASH.primes = (BITBOARD*) realloc(&HASH, HASH.count * sizeof(BITBOARD)); // <- Cast for g++
+  HASH.primes = (int*) realloc(&HASH, HASH.count * sizeof(int)); // <- Cast for g++
 }
 
 static void System()
 {
   P("{ # Hash");
   P("  HASH.primes_n = %i,", HASH.primes_n);
-  P("  HASH.size = %i MB,", (HASH.count * (sizeof(BITBOARD))) / (1024 * 1024));
-  P("  HASH.count = %i,", HASH.count);
-  P("  HASH.key = %i}", HASH.key);
+  P("  HASH.size     = %i # MB,", (HASH.count * (sizeof(BITBOARD))) / (1024 * 1024));
+  P("  HASH.count    = %i,", HASH.count);
+  P("  HASH.key      = %i", HASH.key);
   P("}");
 }
 
@@ -236,7 +195,6 @@ static void Print_version()
   P("  version = %s,", VERSION);
   P("  author  = %s,", AUTHOR);
   P("  description = fast_primes_ll, A fast prime number generator in C Language");
-  
   P("}");
 }
 
@@ -249,17 +207,18 @@ static void Print_help()
   P("  fast_primes_ll -isprime 882 # is it a prime?");
   P("}");
   P("");
-  P("{ # fast_primes_ll commands");
+  P("{ # Commands");
   P("  -h(elp)         = This help,");
   P("  -v(ersion)      = Version,");
   P("  -bench          = Benchmark fast_primes_ll,");
   P("  -system         = System info,");
-  P("  -isprime [NUM]  = Check if whether this number is a prime,");
+  P("  -isprime [NUM]  = Check if whether N is a prime,");
+  P("  -nthprime [NUM] = Get N:th prime,");
   P("  -list [NUM]     = Print all primes up to N");
   P("}");
   P("");
-  P("{ # Full source code, please see");
-  P("  <https://github.com/SamuraiDangyo/fastprimes/>");
+  P("{ # Full source code, please see:");
+  P("  <https://github.com/SamuraiDangyo/fast_primes_ll/>");
   P("}");
   exit(0);
 }
@@ -273,6 +232,27 @@ static void Command_isprime()
     P("{ No, %i is not a prime number. }", n);
 }
 
+static int Nth_prime(const int prime_n)
+{
+  int n = Max(0, prime_n);
+  if (n < HASH.primes_n)
+    return HASH.primes[n];
+  while (1) {
+    Add_prime(Next_prime());
+    if (HASH.primes_n == n)
+      return Last_prime();
+  }
+}
+
+static void Command_nthprime()
+{
+  int n = Token_next_int();
+  P("{ # Results nthprime");
+  P("  N        = %i,", n);
+  P("  nthprime = %i", Nth_prime(n - 1));
+  P("}");
+}
+
 static void Command_list()
 {
   int n = Max(10, Token_next_int());
@@ -282,9 +262,8 @@ static void Command_list()
 
 static void Add_prime(const int prime)
 {
-  if (HASH.primes_n >= HASH.count) {
+  if (HASH.primes_n >= HASH.count)
     Hashtable_make_bigger();
-  }
   HASH.primes[HASH.primes_n] = prime;
   HASH.primes_n++;
 }
@@ -326,14 +305,12 @@ static int Next_prime()
 {
   int candidate = Last_prime() + 1;
   while (1) {
-    if (Is_prime(candidate)) {
+    if (Is_prime(candidate))
       return candidate;
-    } else {
+    else
       candidate++;
-    }
   }
   FCP_ASSERT(0)
-  return 0;
 }
 
 static void Insert_primes(const int usize)
@@ -354,17 +331,23 @@ static void Init_primes()
 static void Bench()
 {
   int i;
-  P("> Benching ...");
+  P("> Benching ...\n");
   BITBOARD diff;
   BITBOARD start = Now();
   HASH.primes_n = 0; // Just for benching
   Add_prime(2);
   Add_prime(3);
-  for (i = 0; i < 30000; i++)
+  for (i = 0; i < 100000; i++) {
+    if ((i + 1) % 10000 == 0)
+      P("{ done = %i%% }", (i + 1) / 1000);
     Add_prime(Next_prime());
+  }
   diff = Now() - start;
-  P("{ # Results");
-  P("  time              = %.3fs,\n  primes_per_second = %llu\n}", 0.001f * DOUBLE(diff), Nps(HASH.primes_n, diff));
+  P("");
+  P("{ # Benchmarks");
+  P("  time              = %.3fs,", 0.001f * DOUBLE(diff));
+  P("  primes_per_second = %llu", Nps(HASH.primes_n, diff));
+  P("}");
 }
 
 static void Print_primes(const int usize)
@@ -393,6 +376,8 @@ static void FCP_commands()
       System();
     else if (Token_next("list"))
       Command_list();
+    else if (Token_next("nthprime"))
+      Command_nthprime();
     Token_expect(";");
   }
   if (TOKENS_N < 2)
@@ -403,7 +388,6 @@ static void Init_tokens(int argc, char **argv)
 {
   int i;
   Token_reset();
-  // "-koth -perft 5" -> "; koth ; perft 5 ;"
   for (i = 1 /* skip ./fast_primes_ll */; i < argc; i++) {
     if (argv[i][0] == '-' && strlen(argv[i]) > 1) {
       Token_add(";");
@@ -413,15 +397,28 @@ static void Init_tokens(int argc, char **argv)
     }
   }
   Token_add(";");
-  //  Debug_tokens();
+}
+
+static void Ok()
+{
+  FCP_ASSERT(User_is_prime(37));
+  FCP_ASSERT(User_is_prime(53));
+  FCP_ASSERT(Nth_prime(17) == 59);
+  FCP_ASSERT(Nth_prime(34) == 139);
+}
+
+static void Go()
+{
+  Hashtable_set_size(HASH_SIZE);
+  Init_primes();
+  Ok();
+  FCP_commands();
 }
 
 int main(int argc, char **argv)
 {
   atexit(Free_memory); // No memory leaks
   Init_tokens(argc, argv);
-  Hashtable_set_size(64); // 64MB | Starting size
-  Init_primes();
-  FCP_commands();
+  Go();
   return EXIT_SUCCESS;
 }
