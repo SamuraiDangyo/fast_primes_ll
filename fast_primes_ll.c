@@ -20,8 +20,9 @@
 #include "fast_primes_ll.h"
 
 #define NAME    "fast_primes_ll"
-#define VERSION "1.2"
+#define VERSION "1.21"
 #define AUTHOR  "Toni Helminen"
+
 #define HASH_SIZE 64 /* MB / Starting size */
 
 typedef struct {
@@ -197,17 +198,17 @@ static void Print_help()
   P("");
   P("{ # How to use");
   P("  fast_primes_ll [COMMAND]... [OPTION]...,");
-  P("  fast_primes_ll -isprime 882 # is it a prime?");
+  P("  fast_primes_ll -is 882 # is it a prime?");
   P("}");
   P("");
   P("{ # Commands");
-  P("  -h(elp)         = This help,");
-  P("  -v(ersion)      = Version,");
-  P("  -bench          = Benchmark fast_primes_ll,");
-  P("  -system         = System info,");
-  P("  -isprime [NUM]  = Check if whether N is a prime,");
-  P("  -nthprime [NUM] = Get N:th prime,");
-  P("  -list [NUM]     = Print all primes up to N");
+  P("  -h(elp)       = This help,");
+  P("  -v(ersion)    = Version,");
+  P("  -bench        = Benchmark fast_primes_ll,");
+  P("  -system       = System info,");
+  P("  -is(prime) N  = Check if whether N is a prime,");
+  P("  -nth(prime) N = Print Nth prime,");
+  P("  -list N       = Print all primes up to N");
   P("}");
   P("");
   P("{ # Full source code, please see:");
@@ -361,7 +362,7 @@ static void FCP_commands()
       Print_version();
     else if (Token_next("h") || Token_next("help"))
       Print_help();
-    else if (Token_next("isprime"))
+    else if (Token_next("isprime") || Token_next("is"))
       Command_isprime();
     else if (Token_next("bench"))
       Bench();
@@ -369,7 +370,7 @@ static void FCP_commands()
       System();
     else if (Token_next("list"))
       Command_list();
-    else if (Token_next("nthprime"))
+    else if (Token_next("nthprime") || Token_next("nth"))
       Command_nthprime();
     Token_expect(";");
   }
