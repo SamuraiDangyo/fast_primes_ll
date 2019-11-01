@@ -20,7 +20,7 @@
 #include "fast_primes_ll.h"
 
 #define NAME    "fast_primes_ll"
-#define VERSION "1.1"
+#define VERSION "1.2"
 #define AUTHOR  "Toni Helminen"
 #define HASH_SIZE 64 /* MB / Starting size */
 
@@ -30,7 +30,6 @@ typedef struct {
   int primes_n;
   int count;
   int last_size;
-  int key;
 } HASHTABLE_T;
 
 static char TOKENS[MAX_TOKENS][256] = {{0}};
@@ -162,11 +161,6 @@ static void Hashtable_set_size(const int usize /* MB */)
   HASH.size >>= 1;
   HASH.primes_n = 0;
   HASH.count = INT(HASH.size / sizeof(BITBOARD));
-  HASH.key = 1;
-  while (HASH.key <= HASH.count) // Create key according to count
-    HASH.key <<= 1;
-  HASH.key >>= 1;
-  HASH.key -= 1; // 1000b = 8d / - 1d / 0111b = 7d
   HASH.primes = (int*) calloc(HASH.count, sizeof(int)); // <- Cast for g++
   FCP_ASSERT(HASH.primes != NULL) // Make sure there is enough space
   Init_primes();
@@ -184,7 +178,6 @@ static void System()
   P("  HASH.primes_n = %i,", HASH.primes_n);
   P("  HASH.size     = %i # MB,", (HASH.count * (sizeof(BITBOARD))) / (1024 * 1024));
   P("  HASH.count    = %i,", HASH.count);
-  P("  HASH.key      = %i", HASH.key);
   P("}");
 }
 
