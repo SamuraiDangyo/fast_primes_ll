@@ -1,5 +1,5 @@
 ## fast_primes_ll
-A fast prime number generator in C Language
+A Fast prime number generator in C Language
 
 ### Help
 > ```fast_primes_ll -h```

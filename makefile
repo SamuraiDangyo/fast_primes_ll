@@ -1,7 +1,7 @@
 INSTALLDIR=/usr/games/
 
 build:
-	gcc -Wall -O3 fast_primes_ll.c -o fast_primes_ll
+	gcc -Wall -O2 fast_primes_ll.c -o fast_primes_ll
 
 clean:
 	rm -f fast_primes_ll
