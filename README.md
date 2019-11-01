@@ -2,7 +2,7 @@
 A fast prime number generator in C Language
 
 ### Help
-```fast_primes_ll -h```
+> ```fast_primes_ll -h```
 
 ### Install
 > ```make install```
