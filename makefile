@@ -7,7 +7,7 @@ clean:
 	rm -f fast_primes_ll
 	
 go:
-	./fast_primes_ll -list 1000 # first 1000 primes
+	./fast_primes_ll -bench
 	
 install: build
 	@echo You must be root to install

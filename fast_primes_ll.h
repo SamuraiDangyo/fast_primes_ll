@@ -9,7 +9,6 @@
 #include <stdbool.h>
 
 #define BITBOARD unsigned long long
-#define MAX_TOKENS 128
 
 #define INT(a) ((int) (a))
 #define DOUBLE(f) ((double) (f))
@@ -22,7 +21,7 @@ static inline /* <- make me faster! */ int Max(const int a, const int b);
 static inline int Min(const int a, const int b);
 static bool Equal_strings(const char *a, const char *b);
 static BITBOARD Now();
-static BITBOARD Nps(const BITBOARD nodes, const BITBOARD ms);
+static BITBOARD Pps(const BITBOARD nodes, const BITBOARD ms);
 static void P(const char *format, ...);
 static void Ok();
 static void Go();
@@ -44,15 +43,15 @@ static void Print_version();
 static void Print_help();
 static void Command_isprime();
 static void Command_list();
-static void Add_prime(const int prime);
+static void Add_prime(const BITBOARD prime);
 static int Last_prime();
-static bool Is_prime(const int prime);
-static bool User_is_prime(const int prime);
+static bool Is_prime(const BITBOARD prime);
+static bool Is_prime_gen(const BITBOARD prime);
 static int Next_prime();
 static void Insert_primes(const int usize);
 static void Init_primes();
 static void Bench();
-static int Nth_prime(const int prime_n);
+static BITBOARD Nth_prime(const int prime_n);
 static void Command_nthprime();
 static void Print_primes(const int usize);
 static void FCP_commands();

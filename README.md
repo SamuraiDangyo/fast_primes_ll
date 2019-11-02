@@ -1,11 +1,11 @@
 ## fast_primes_ll
 A fast prime number generator in C Language
 
-### Help
-```fast_primes_ll -h```
-
 ### Install
 ```make install```
 
+### Help
+```fast_primes_ll -h```
+
 ### Usage
-```fast_primes_ll -isprime 331 # for example```
+```fast_primes_ll -nth 10001 # Find out what's the 10,001st prime?```
