@@ -20,7 +20,7 @@
 #include "fast_primes_ll.h"
 
 #define NAME    "fast_primes_ll"
-#define VERSION "1.28"
+#define VERSION "1.29"
 #define AUTHOR  "Toni Helminen"
 
 #define MAX_TOKENS 32
@@ -210,7 +210,7 @@ static void Print_help()
   P("  -v(ersion)    = Version,");
   P("  -bench        = Benchmarking,");
   P("  -system       = System info,");
-  P("  -is(prime) N  = Check if whether N is a prime,");
+  P("  -is(prime) N  = See if N is a prime,");
   P("  -nth(prime) N = Print Nth prime,");
   P("  -primes N     = Print all primes up to N");
   P("}");
@@ -224,7 +224,7 @@ static void Print_help()
 static void Command_isprime()
 {
   int n = Token_next_int();
-  if (Is_prime_gen(n))
+  if (Is_prime(n))
     P("{ Yes, %i is a prime number. }", n);
   else
     P("{ No, %i is not a prime number. }", n);
@@ -268,7 +268,7 @@ static void Add_prime(const BITBOARD prime)
   PRIMES.primes_n++;
 }
 
-static bool Is_prime(const BITBOARD prime)
+static bool Is_prime_nogen(const BITBOARD prime)
 {
   int i;
   if (prime < 2)
@@ -279,7 +279,7 @@ static bool Is_prime(const BITBOARD prime)
   return 1;
 }
 
-static bool Is_prime_gen(const BITBOARD prime)
+static bool Is_prime(const BITBOARD prime)
 {
 
   int i, p;
@@ -306,7 +306,7 @@ static int Next_prime()
 {
   int candidate = Last_prime() + 1;
   while (1)
-    if (Is_prime(candidate))
+    if (Is_prime_nogen(candidate))
       return candidate;
     else
       candidate++;
@@ -402,10 +402,10 @@ static void Init_tokens(int argc, char **argv)
 
 static void Ok()
 {
-  FCP_ASSERT(Is_prime_gen(37));
-  FCP_ASSERT(Is_prime_gen(53));
-  FCP_ASSERT( ! Is_prime_gen(55));
-  FCP_ASSERT( ! Is_prime_gen(0));
+  FCP_ASSERT(Is_prime(37));
+  FCP_ASSERT(Is_prime(53));
+  FCP_ASSERT( ! Is_prime(55));
+  FCP_ASSERT( ! Is_prime(0));
   FCP_ASSERT(Nth_prime(17) == 59);
   FCP_ASSERT(Nth_prime(34) == 139);
 }
