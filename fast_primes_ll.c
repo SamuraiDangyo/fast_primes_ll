@@ -20,7 +20,7 @@
 #include "fast_primes_ll.h"
 
 #define NAME    "fast_primes_ll"
-#define VERSION "1.25"
+#define VERSION "1.27"
 #define AUTHOR  "Toni Helminen"
 
 #define MAX_TOKENS 32
@@ -337,24 +337,23 @@ static void Init_primes()
 
 static void Bench()
 {
-  int i;
   BITBOARD diff;
   BITBOARD start = Now();
   P("> Benching ...\n");
   HASH.primes_n = 0;
   Add_prime(2);
   Add_prime(3);
-  for (i = 0; i < 1000000; i++) {
-    if ((i + 1) % 100000 == 0)
-      P("{ done = %i%% }", (i + 1) / 10000);
+  while (HASH.primes_n < 1000000) {
     Add_prime(Next_prime());
+    if (HASH.primes_n % 100000 == 0)
+      P("{ progress = %i%% }", HASH.primes_n / 10000);
   }
   diff = Now() - start;
   P("");
   P("{ # Benchmarks");
   P("  time              = %.3fs,", 0.001f * DOUBLE(diff));
   P("  primes_per_second = %llu,", Pps(HASH.primes_n, diff));
-  P("  last_prime        = %llu", Last_prime());
+  P("  primes            = %i", HASH.primes_n);
   P("}");
 }
 
