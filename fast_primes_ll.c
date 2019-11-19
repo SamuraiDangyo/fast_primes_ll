@@ -20,7 +20,7 @@
 #include "fast_primes_ll.h"
 
 #define NAME       "fast_primes_ll"
-#define VERSION    "1.31"
+#define VERSION    "1.32"
 #define AUTHOR     "Toni Helminen"
 
 #define MAX_TOKENS 32
@@ -321,7 +321,8 @@ static bool Is_prime_nogen(const BITBOARD prime)
 static bool Is_prime(const BITBOARD prime)
 {
 
-  int i, p;
+  int i;
+  BITBOARD p;
 
   if (prime <= 1)
     return 0;
