@@ -10,15 +10,15 @@
 
 #define BITBOARD unsigned long long
 
-#define INT(a) ((int) (a))
-#define DOUBLE(f) ((double) (f))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define ULL(a) ((BITBOARD) (a))
+#define INT(a)           ((int) (a))
+#define DOUBLE(f)        ((double) (f))
+#define MAX(a, b)        (((a) > (b)) ? (a) : (b))
+#define MIN(a, b)        (((a) < (b)) ? (a) : (b))
+#define ULL(a)           ((BITBOARD) (a))
 #define FCP_ASSERT(test) if ( ! (test)) {P("fast_primes_ll Error: Line: %i", __LINE__); exit(0);}
 
-static inline /* <- make me faster! */ int Max(const int a, const int b);
-static inline int Min(const int a, const int b);
+static int Max(const int a, const int b);
+static int Min(const int a, const int b);
 static bool Equal_strings(const char *a, const char *b);
 static BITBOARD Now();
 static BITBOARD Pps(const BITBOARD nodes, const BITBOARD ms);
