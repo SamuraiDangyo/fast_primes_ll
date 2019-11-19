@@ -20,7 +20,7 @@
 #include "fast_primes_ll.h"
 
 #define NAME       "fast_primes_ll"
-#define VERSION    "1.32"
+#define VERSION    "1.33"
 #define AUTHOR     "Toni Helminen"
 
 #define MAX_TOKENS 32
@@ -153,6 +153,7 @@ static void Primestable_free_memory()
     return;
 
   free(PRIMES.primes);
+
   PRIMES.primes = 0;
   PRIMES.size   = 0;
 }
