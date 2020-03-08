@@ -17,14 +17,51 @@
 * If not, see <http://www.gnu.org/licenses/>.
 **/
 
-#include "fast_primes_ll.h"
+///
+/// C Headers
+///
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdbool.h>
+
+#include <string.h>
+#include <sys/time.h>
+
+///
+/// Constants
+///
 
 #define NAME       "fast_primes_ll"
-#define VERSION    "1.33"
+#define VERSION    "1.34"
 #define AUTHOR     "Toni Helminen"
 
+#define BITBOARD   unsigned long long
+
 #define MAX_TOKENS 32
-#define HASH_SIZE  64 /* MB / Starting size */
+#define HASH_SIZE  64 /* MB | Starting size */
+
+///
+/// Macros
+///
+
+#define INT(a)           ((int) (a))
+#define DOUBLE(f)        ((double) (f))
+#define ULL(a)           ((BITBOARD) (a))
+#define MAX(a, b)        (((a) > (b)) ? (a) : (b))
+#define MIN(a, b)        (((a) < (b)) ? (a) : (b))
+#define MYASSERT(test)   if ( ! (test)) {Print("fast_primes_ll Error: Line: %i", __LINE__); exit(EXIT_FAILURE);}
+
+///
+/// fast_primes_ll Header
+///
+
+#include "fast_primes_ll.h"
+
+///
+/// Structs
+///
 
 typedef struct {
   BITBOARD *primes;
@@ -34,10 +71,18 @@ typedef struct {
   int last_size;
 } PRIMES_T;
 
-static char TOKENS[MAX_TOKENS][64]  = {{0}};
-static int TOKENS_N                 = 0;
-static int TOKENS_I                 = 0;
-static PRIMES_T PRIMES              = {0};
+///
+/// Variables
+///
+
+static char TOKENS[MAX_TOKENS][64] = {{0}};
+static int TOKENS_N                = 0;
+static int TOKENS_I                = 0;
+static PRIMES_T PRIMES             = {0};
+
+///
+/// Functions
+///
 
 static int Max(const int a, const int b)
 {
@@ -49,26 +94,24 @@ static int Min(const int a, const int b)
   return a < b ? a : b;
 }
 
-static bool Equal_strings(const char *a, const char *b)
+static bool Equal_strings(const char *str1, const char *str2)
 {
-  return strcmp(a, b) ? 0 : 1;
+  return strcmp(str1, str2) ? 0 : 1;
 }
 
 static BITBOARD Now()
 {
-  static struct timeval t;
-
-  FCP_ASSERT(gettimeofday(&t, NULL) == 0)
-
-  return 1000 * t.tv_sec + t.tv_usec / 1000;
+  static struct timeval tv;
+  MYASSERT(gettimeofday(&tv, NULL) == 0)
+  return 1000 * tv.tv_sec + tv.tv_usec / 1000;
 }
 
 static BITBOARD Pps(const BITBOARD nodes, const BITBOARD ms)
 {
-  return ms < 1 ? 0 : (1000 * nodes) / ms;
+  return ms ? (1000 * nodes) / ms : 0;
 }
 
-static void P(const char *format, ...)
+static void Print(const char *format, ...)
 {
   va_list a;
 
@@ -81,7 +124,8 @@ static void P(const char *format, ...)
 
 static void Token_add(const char *s)
 {
-  FCP_ASSERT(TOKENS_N + 2 < MAX_TOKENS)
+  MYASSERT(TOKENS_N + 2 < MAX_TOKENS)
+
   strcpy(TOKENS[TOKENS_N], s);
   TOKENS_N++;
 }
@@ -107,27 +151,28 @@ static bool Token_ok()
   return TOKENS_I < TOKENS_N;
 }
 
-static bool Token_is(const char *s)
+static bool Token_is(const char *str)
 {
-  return Token_ok() && Equal_strings(s, Token_current());
+  return Token_ok() && Equal_strings(str, Token_current());
 }
 
-static void Token_expect(const char *s)
+static void Token_expect(const char *str)
 {
-  if ( ! Token_is(s)) {
-    P("{ # Error");
-    P("  expected  = '%s'", s);
-    P("  but_found = '%s'", Token_current());
-    P("}");
-    exit(0);
+  if ( ! Token_is(str)) {
+    Print("{ # Errors");
+    Print("  expected  : '%s'", str);
+    Print("  but_found : '%s'", Token_current());
+    Print("}");
+
+    exit(EXIT_SUCCESS);
   }
 
   Token_pop();
 }
 
-static bool Token_next(const char *s)
+static bool Token_next(const char *str)
 {
-  if ( ! Token_is(s))
+  if ( ! Token_is(str))
     return 0;
 
   Token_pop();
@@ -137,14 +182,14 @@ static bool Token_next(const char *s)
 
 static int Token_next_int()
 {
-  int r = 0;
+  int num = 0;
 
   if (Token_ok() && ! Token_is(";")) { // Assume number
-    r = atoi(TOKENS[TOKENS_I]);
+    num = atoi(TOKENS[TOKENS_I]);
     Token_pop();
   }
 
-  return r;
+  return num;
 }
 
 static void Primestable_free_memory()
@@ -158,11 +203,6 @@ static void Primestable_free_memory()
   PRIMES.size   = 0;
 }
 
-static void Free_memory()
-{
-  Primestable_free_memory();
-}
-
 static void Primestable_set_size(const int usize /* MB */)
 {
   BITBOARD size = ULL(usize);
@@ -171,7 +211,7 @@ static void Primestable_set_size(const int usize /* MB */)
 
   size = MAX(size, 1);
   size = MIN(size, 1024 * 1024); // 1 PB
-  size = (1 << 20) * size; // To MB
+  size = (1 << 20) * size;       // To MB
 
   PRIMES.size = 1;
 
@@ -183,79 +223,81 @@ static void Primestable_set_size(const int usize /* MB */)
   PRIMES.count    = INT(PRIMES.size / sizeof(BITBOARD));
   PRIMES.primes   = calloc(PRIMES.count, sizeof(BITBOARD));
 
-  FCP_ASSERT(PRIMES.primes != NULL) // Make sure there is enough space
+  MYASSERT(PRIMES.primes != NULL) // Make sure there is enough space
 
   Init_primes();
 }
 
 static void Primestable_make_bigger()
 {
-  PRIMES.count = 2 * PRIMES.count;
+  PRIMES.count  = 2 * PRIMES.count;
   PRIMES.primes = realloc(PRIMES.primes, PRIMES.count * sizeof(BITBOARD));
-  FCP_ASSERT(PRIMES.primes != NULL) // Make sure there is enough space
+
+  MYASSERT(PRIMES.primes != NULL) // Make sure there is enough space
 }
 
 static void System()
 {
-  P("{ # Hash");
-  P("  .primes_n = %i", PRIMES.primes_n);
-  P("  .count    = %i", PRIMES.count);
-  P("  .size     = %i # MB", (PRIMES.count * (sizeof(BITBOARD))) / (1024 * 1024));
-  P("}");
+  Print("{ # Hash");
+  Print("  .primes_n : %i", PRIMES.primes_n);
+  Print("  .count    : %i", PRIMES.count);
+  Print("  .size     : %i # MB", (PRIMES.count * (sizeof(BITBOARD))) / (1024 * 1024));
+  Print("}");
 }
 
 static void Print_version()
 {
-  P("{ # Version");
-  P("  name        = %s", NAME);
-  P("  version     = %s", VERSION);
-  P("  author      = %s", AUTHOR);
-  P("  description = A fast prime number generator in C Language");
-  P("}");
+  Print("{ # Version");
+  Print("  name         : %s", NAME);
+  Print("  version      : %s", VERSION);
+  Print("  author       : %s", AUTHOR);
+  Print("  description  : A fast prime number generator in C Language");
+  Print("}");
 }
 
 static void Print_help()
 {
-  P("{ # Help");
-  P("  Usage         = fast_primes_ll [OPTION]... [PARAM]...");
-  P("}\n");
+  Print("{ # Help %s v%s ", NAME, VERSION);
+  Print("  usage         : > fast_primes_ll [OPTION]... [PARAM]...");
+  Print("}\n");
 
-  P("{ # General information");
-  P("  what          = fast_primes_ll is a fast prime number generator");
-  P("  usage         = fast_primes_ll [COMMAND]... [OPTION]...");
-  P("  example       = fast_primes_ll -nth 10001 # What's the 10,001st prime?");
-  P("}\n");
+  Print("{ # General Information");
+  Print("  what          : fast_primes_ll is a fast prime number generator");
+  Print("  usage         : fast_primes_ll [COMMAND]... [OPTION]...");
+  Print("  example       : > fast_primes_ll -nthprime 10001 # What's the 10,001st prime?");
+  Print("}\n");
 
-  P("{ # Commands");
-  P("  -h(elp)       = This help");
-  P("  -v(ersion)    = Show version");
-  P("  -bench        = Run benchmarks");
-  P("  -system       = Show system info");
-  P("  -is(prime) N  = See if N is a prime");
-  P("  -nth(prime) N = Show Nth prime");
-  P("  -primes N     = Show all primes up to N");
-  P("}\n");
+  Print("{ # Commands");
+  Print("  -help         : This help");
+  Print("  -version      : Show version");
+  Print("  -bench        : Run benchmarks");
+  Print("  -system       : Show system info");
+  Print("  -isprime [N]  : See if N is a prime");
+  Print("  -nthprime [N] : Show Nth prime");
+  Print("  -primes [N]   : Show all primes up to N");
+  Print("}\n");
 
-  P("{ # Full source code, please see:");
-  P("  <https://github.com/SamuraiDangyo/fast_primes_ll/>");
-  P("}");
-  exit(0);
+  Print("{ # Full source code, please see:");
+  Print("  <https://github.com/SamuraiDangyo/fast_primes_ll/>");
+  Print("}");
+
+  exit(EXIT_SUCCESS);
 }
 
 static void Command_isprime()
 {
-  const int n          = Token_next_int();
+  const int num        = Token_next_int();
   const BITBOARD start = Now();
 
-  P("{ # isprime");
+  Print("{ # isprime");
 
-  if (Is_prime(n))
-    P("  result = Yes, %i is a prime number.", n);
+  if (Is_prime(num))
+    Print("  result  : Yes, %i is a prime number.", num);
   else
-    P("  result = No, %i is not a prime number.", n);
+    Print("  result  : No, %i is not a prime number.", num);
 
-  P("  time   = %.3fs", 0.001f * DOUBLE(Now() - start));
-  P("}");
+  Print("  time    : %.3fs", 0.001f * DOUBLE(Now() - start));
+  Print("}");
 }
 
 static BITBOARD Nth_prime(const int prime_n)
@@ -279,21 +321,21 @@ static void Command_nthprime()
   const int n          = Max(0, Token_next_int());
   const BITBOARD start = Now();
 
-  P("{ # nthprime");
-  P("  nth      = %i", n);
-  P("  prime    = %llu", Nth_prime(n));
-  P("  time     = %.3fs", 0.001f * DOUBLE(Now() - start));
-  P("}");
+  Print("{ # nthprime");
+  Print("  nth      : %i", n);
+  Print("  prime    : %llu", Nth_prime(n));
+  Print("  time     : %.3fs", 0.001f * DOUBLE(Now() - start));
+  Print("}");
 }
 
 static void Command_primes()
 {
-  const int n = Max(2, Token_next_int());
+  const int num = Max(2, Token_next_int());
 
-  P("{ # First %i primes generated by %s v%s", n, NAME, VERSION);
-  Print_primes(n);
-  Insert_primes(n);
-  P("}");
+  Print("{ # First %i primes generated by %s v%s", num, NAME, VERSION);
+  Print_primes(num);
+  Insert_primes(num);
+  Print("}");
 }
 
 static void Add_prime(const BITBOARD prime)
@@ -319,25 +361,28 @@ static bool Is_prime_nogen(const BITBOARD prime)
   return 1;
 }
 
-static bool Is_prime(const BITBOARD prime)
+static bool Is_prime(const BITBOARD maybe_prime)
 {
 
   int i;
-  BITBOARD p;
+  BITBOARD prime;
 
-  if (prime <= 1)
+  if (maybe_prime <= 1)
     return 0;
 
   for (i = 0; i < PRIMES.primes_n; i++)
-    if (PRIMES.primes[i] == prime)
+    if (PRIMES.primes[i] == maybe_prime)
       return 1;
 
   while (1) {
-    p = Next_prime();
-    Add_prime(p);
-    if (p == prime)
+    prime = Next_prime();
+
+    Add_prime(prime);
+
+    if (prime == maybe_prime)
       return 1;
-    if (p > prime)
+
+    if (prime > maybe_prime)
       return 0;
   }
 
@@ -359,18 +404,18 @@ static int Next_prime()
     else
       candidate++;
 
-  FCP_ASSERT(0)
+  MYASSERT(0)
 }
 
-static void Insert_primes(const int n)
+static void Insert_primes(const int how_many)
 {
-  int i = 0;
-  const int l = PRIMES.primes_n;
+  int counter        = 0;
+  const int primes_n = PRIMES.primes_n;
 
-  while (PRIMES.primes_n < n) {
+  while (PRIMES.primes_n < how_many) {
     Add_prime(Next_prime());
-    P("  %i = %llu", i + 1 + l, Last_prime());
-    i++;
+    Print("  %i: %llu", counter + 1 + primes_n, Last_prime());
+    counter++;
   }
 }
 
@@ -392,54 +437,49 @@ static void Bench()
   BITBOARD diff;
   const BITBOARD start = Now();
 
-  P("{ # Benching ...\n}\n");
+  Print("{ # Benching ... }\n");
 
   PRIMES.primes_n = 0;
+
   Add_prime(2);
   Add_prime(3);
 
   while (PRIMES.primes_n < 1000000) {
     Add_prime(Next_prime());
+
     if (PRIMES.primes_n % 100000 == 0)
-      P("{ Progress = %i%% }", PRIMES.primes_n / 10000);
+      Print("{ Progress : %i%% }", PRIMES.primes_n / 10000);
   }
 
   diff = Now() - start;
 
-  P("\n{ # Benchmarks");
-  P("  time              = %.3fs", 0.001f * DOUBLE(diff));
-  P("  primes_per_second = %llu", Pps(PRIMES.primes_n, diff));
-  P("  primes            = %i", PRIMES.primes_n);
-  P("}");
+  Print("\n{ # Benchmarks");
+  Print("  time              : %.3fs", 0.001f * DOUBLE(diff));
+  Print("  primes_per_second : %llu",  Pps(PRIMES.primes_n, diff));
+  Print("  primes            : %i",    PRIMES.primes_n);
+  Print("}");
 }
 
 static void Print_primes(const int usize)
 {
   int i;
-  const int n = Min(PRIMES.primes_n, usize);
+  const int how_many = Min(PRIMES.primes_n, usize);
 
-  for (i = 0; i < n; i++)
-    P("  %i = %llu", i + 1, PRIMES.primes[i]);
+  for (i = 0; i < how_many; i++)
+    Print("  %i: %llu", i + 1, PRIMES.primes[i]);
 }
 
-static void FCP_commands()
+static void Commands()
 {
   Token_expect(";");
 
-  if (Token_next("v") || Token_next("version"))
-    Print_version();
-  else if (Token_next("h") || Token_next("help"))
-    Print_help();
-  else if (Token_next("isprime") || Token_next("is"))
-    Command_isprime();
-  else if (Token_next("bench"))
-    Bench();
-  else if (Token_next("system"))
-    System();
-  else if (Token_next("primes"))
-    Command_primes();
-  else if (Token_next("nthprime") || Token_next("nth"))
-    Command_nthprime();
+  if (Token_next("version"))       Print_version();
+  else if (Token_next("help"))     Print_help();
+  else if (Token_next("isprime"))  Command_isprime();
+  else if (Token_next("bench"))    Bench();
+  else if (Token_next("system"))   System();
+  else if (Token_next("primes"))   Command_primes();
+  else if (Token_next("nthprime")) Command_nthprime();
 
   Token_expect(";");
 
@@ -468,22 +508,22 @@ static void Ok()
 {
   // Yes
 
-  FCP_ASSERT(Is_prime(37));
-  FCP_ASSERT(Is_prime(53));
+  MYASSERT(Is_prime(37));
+  MYASSERT(Is_prime(53));
 
-  FCP_ASSERT(Nth_prime(-1) == 2);
-  FCP_ASSERT(Nth_prime(0) == 2);
-  FCP_ASSERT(Nth_prime(1) == 2);
-  FCP_ASSERT(Nth_prime(2) == 3);
-  FCP_ASSERT(Nth_prime(17) == 59);
-  FCP_ASSERT(Nth_prime(34) == 139);
+  MYASSERT(Nth_prime(-1) == 2);
+  MYASSERT(Nth_prime(0)  == 2);
+  MYASSERT(Nth_prime(1)  == 2);
+  MYASSERT(Nth_prime(2)  == 3);
+  MYASSERT(Nth_prime(17) == 59);
+  MYASSERT(Nth_prime(34) == 139);
 
   // Nope
 
-  FCP_ASSERT( ! Is_prime(55));
-  FCP_ASSERT( ! Is_prime(0));
+  MYASSERT( ! Is_prime(55));
+  MYASSERT( ! Is_prime(0));
 
-  FCP_ASSERT(Nth_prime(1) != 7);
+  MYASSERT(Nth_prime(1) != 7);
 }
 
 static void Go()
@@ -491,15 +531,13 @@ static void Go()
   Primestable_set_size(HASH_SIZE);
   Init_primes();
   Ok();
-  FCP_commands();
+  Commands();
 }
 
 int main(int argc, char **argv)
 {
-  atexit(Free_memory); // No memory leaks
-
+  atexit(Primestable_free_memory); // No memory leaks
   Init_tokens(argc, argv);
-
   Go();
 
   return EXIT_SUCCESS;
