@@ -3,13 +3,14 @@ INSTALLDIR=/usr/bin/
 # [gcc, g++, clang, clang++]
 CC=gcc
 
+EXE=fast_primes_ll
+
 ##
 ## Public targets
 ##
 
-
 all:
-	$(CC) -Wall -O2 fast_primes_ll.c -o fast_primes_ll
+	$(CC) -Wall -O2 fast_primes_ll.c -o $(EXE)
 
 clean:
 	rm -f fast_primes_ll
@@ -19,17 +20,17 @@ strip:
 
 # You must be root to install
 install:
-	if [ -d $(INSTALLDIR) ]; then sudo cp -f fast_primes_ll $(INSTALLDIR); fi
+	if [ -d $(INSTALLDIR) ]; then sudo cp -f $(EXE) $(INSTALLDIR); fi
 
 help:
 	@echo "# Help fast_primes_ll #"
 	@echo ""
-	@echo "> make target"
+	@echo "> make [target]"
 	@echo ""
 	@echo "## Public Targets ##"
 	@echo "help     This help"
-	@echo "all      Build Sapeli"
-	@echo "install  Install Sapeli"
+	@echo "all      Build fast_primes_ll"
+	@echo "install  Install fast_primes_ll"
 	@echo "clean    Clean up"
 	@echo "strip    Strip executable"
 	@echo ""
@@ -47,4 +48,4 @@ help:
 ##
 
 bench:
-	./fast_primes_ll -bench
+	./$(EXE) -bench
