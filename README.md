@@ -6,6 +6,7 @@ A fast prime number generator in C Language
 
 ### Help
 ```fast_primes_ll -help``` : Main help
+
 ```make help```            : How to compile
 
 ### Usage
