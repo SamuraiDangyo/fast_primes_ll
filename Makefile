@@ -3,14 +3,12 @@ INSTALLDIR=/usr/bin/
 # [gcc, g++, clang, clang++]
 CC=gcc
 
-EXE=fast_primes_ll
-
 ##
 ## Public targets
 ##
 
 all:
-	$(CC) -Wall -O2 fast_primes_ll.c -o $(EXE)
+	$(CC) -Wall -O2 fast_primes_ll.c -o fast_primes_ll
 
 clean:
 	rm -f fast_primes_ll
@@ -20,7 +18,7 @@ strip:
 
 # You must be root to install
 install:
-	if [ -d $(INSTALLDIR) ]; then sudo cp -f $(EXE) $(INSTALLDIR); fi
+	if [ -d $(INSTALLDIR) ]; then sudo cp -f fast_primes_ll $(INSTALLDIR); fi
 
 help:
 	@echo "# Help fast_primes_ll #"
@@ -30,8 +28,8 @@ help:
 	@echo "## Public Targets ##"
 	@echo "help     This help"
 	@echo "all      Build fast_primes_ll"
-	@echo "install  Install fast_primes_ll"
 	@echo "clean    Clean up"
+	@echo "install  Install fast_primes_ll"
 	@echo "strip    Strip executable"
 	@echo ""
 	@echo "## Supported Compilers ##"
@@ -48,4 +46,4 @@ help:
 ##
 
 bench:
-	./$(EXE) -bench
+	./fast_primes_ll -bench

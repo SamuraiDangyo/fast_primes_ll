@@ -5,9 +5,22 @@ A fast prime number generator in C Language
 ```make clean all install```
 
 ### Help
-```fast_primes_ll -help``` : Main help
+ Main help
+```fast_primes_ll -help```
 
-```make help```            : How to compile
+Makefile help for compiling
+```make help```
 
-### Usage
-```fast_primes_ll -nth 10001``` : Find out what's the 10,001st prime ?
+See also source code :
+```fast_primes_ll.c```
+
+### Examples
+Find out what's the 10,001st prime ?
+```fast_primes_ll -nthPrime 10001```
+
+Is 42 a prime number ?
+```fast_primes_ll -isPrime 42```
+
+First 42 primes
+```fast_primes_ll -primes 42```
+
