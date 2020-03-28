@@ -1,14 +1,14 @@
-![fast_primes_ll](https://github.com/SamuraiDangyo/fast_primes_ll/blob/master/logo.png)
-
-## fast_primes_ll
+# fast_primes_ll
 A fast prime number generator written in C Language
 
-### Install
+![fast_primes_ll](https://github.com/SamuraiDangyo/fast_primes_ll/blob/master/logo.png)
+
+## Install
 ```
 make clean all strip install
 ```
 
-### Help
+## Help
 ```
 # Main help :
 fast_primes_ll -help
@@ -24,7 +24,7 @@ make help
 fast_primes_ll.c
 ```
 
-### Examples
+## Examples
 ```
 # Find out what's the 10,001st prime ?
 fast_primes_ll -nthPrime 10001
@@ -39,3 +39,6 @@ fast_primes_ll -isPrime 42
 First 42 primes !
 fast_primes_ll -primes 42
 ```
+
+## License
+GPLv3
