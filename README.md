@@ -1,32 +1,39 @@
 ## fast_primes_ll
-A fast prime number generator in C Language
+A fast prime number generator written in C Language
 
 ### Install
-```make clean all install```
+```
+make clean all strip install
+```
 
 ### Help
- Main help :
- 
-```fast_primes_ll -help```
+```
+# Main help :
+fast_primes_ll -help
+```
 
-Makefile help for compiling :
+```
+# Makefile help for compiling :
+make help
+```
 
-```make help```
-
-See also source code :
-
-```fast_primes_ll.c```
+```
+# See also source code :
+fast_primes_ll.c
+```
 
 ### Examples
-Find out what's the 10,001st prime ?
+```
+# Find out what's the 10,001st prime ?
+fast_primes_ll -nthPrime 10001
+```
 
-```fast_primes_ll -nthPrime 10001```
+```
+# Is 42 a prime number ?
+fast_primes_ll -isPrime 42
+```
 
-Is 42 a prime number ?
-
-```fast_primes_ll -isPrime 42```
-
+```
 First 42 primes !
-
-```fast_primes_ll -primes 42```
-
+fast_primes_ll -primes 42
+```

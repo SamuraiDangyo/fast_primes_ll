@@ -1,25 +1,25 @@
-/**
-* fast_primes_ll, A fast prime number generator in C Language
-* Copyright (C) 2019 Toni Helminen
-*
-* fast_primes_ll is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* fast_primes_ll is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.
-* If not, see <http://www.gnu.org/licenses/>.
-**/
+/*
+fast_primes_ll, A fast prime number generator written in C Language
+Copyright (C) 2019 Toni Helminen
 
-///
-/// C Headers
-///
+fast_primes_ll is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+fast_primes_ll is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//
+// C Headers
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,21 +29,21 @@
 #include <string.h>
 #include <sys/time.h>
 
-///
-/// Constants
-///
+//
+// Constants
+//
 
 #define NAME           "fast_primes_ll"
-#define VERSION        "1.35"
+#define VERSION        "1.36"
 #define AUTHOR         "Toni Helminen"
 
 #define BITBOARD       unsigned long long
 #define MAX_TOKENS     32
 #define HASH_SIZE      64 /* MB | Starting size */
 
-///
-/// Macros
-///
+//
+// Macros
+//
 
 #define INT(a)         ((int) (a))
 #define DOUBLE(f)      ((double) (f))
@@ -52,15 +52,15 @@
 #define MIN(a, b)      (((a) < (b)) ? (a) : (b))
 #define MYASSERT(test) Assert((test), (__LINE__))
 
-///
-/// fast_primes_ll Header
-///
+//
+// fast_primes_ll Header
+//
 
 #include "fast_primes_ll.h"
 
-///
-/// Structs
-///
+//
+// Structs
+//
 
 typedef struct {
   BITBOARD *primes;
@@ -70,18 +70,18 @@ typedef struct {
   int last_size;
 } PRIMES_T;
 
-///
-/// Variables
-///
+//
+// Variables
+//
 
 static char TOKENS[MAX_TOKENS][64] = {{0}};
 static int TOKENS_N                = 0;
 static int TOKENS_I                = 0;
 static PRIMES_T PRIMES             = {0, 0, 0, 0, 0};
 
-///
-/// Functions
-///
+//
+// Functions
+//
 
 static int Max(const int a, const int b)
 {
@@ -98,7 +98,7 @@ static bool EqualStrings(const char *str1, const char *str2)
   return strcmp(str1, str2) ? 0 : 1;
 }
 
-static BITBOARD Now()
+static BITBOARD Now(void)
 {
   static struct timeval tv;
   MYASSERT(( ! gettimeofday(&tv, NULL)));
@@ -129,23 +129,23 @@ static void TokenAdd(const char *s)
   TOKENS_N++;
 }
 
-static void TokenReset()
+static void TokenReset(void)
 {
   TOKENS_I = 0;
   TOKENS_N = 0;
 }
 
-static const char *TokenCurrent()
+static const char *TokenCurrent(void)
 {
   return TokenOk() ? TOKENS[TOKENS_I] : "";
 }
 
-static void TokenPop()
+static void TokenPop(void)
 {
   TOKENS_I++;
 }
 
-static bool TokenOk()
+static bool TokenOk(void)
 {
   return TOKENS_I < TOKENS_N;
 }
@@ -183,7 +183,7 @@ static bool TokenNext(const char *str)
   return 1;
 }
 
-static int TokenNextInt()
+static int TokenNextInt(void)
 {
   int num = 0;
 
@@ -195,7 +195,7 @@ static int TokenNextInt()
   return num;
 }
 
-static void PrimestableFreeMemory()
+static void PrimestableFreeMemory(void)
 {
   if (PRIMES.size <= 0)
     return;
@@ -231,7 +231,7 @@ static void PrimestableSetSize(const int usize /* MB */)
   InitPrimes();
 }
 
-static void PrimestableMakeBigger()
+static void PrimestableMakeBigger(void)
 {
   PRIMES.count  = 2 * PRIMES.count;
   PRIMES.primes = (BITBOARD *) realloc(PRIMES.primes, PRIMES.count * sizeof(BITBOARD));
@@ -239,7 +239,7 @@ static void PrimestableMakeBigger()
   MYASSERT((PRIMES.primes != NULL)); // Make sure there is enough space
 }
 
-static void HashInfo()
+static void HashInfo(void)
 {
   Print("# Hash info");
   Print("primes_n:  %i", PRIMES.primes_n);
@@ -247,18 +247,17 @@ static void HashInfo()
   Print("size:      %i # MB", (PRIMES.count * (sizeof(BITBOARD))) / (1024 * 1024));
 }
 
-static void PrintVersion()
+static void PrintVersion(void)
 {
   Print("%s %s by %s", NAME, VERSION, AUTHOR);
 }
 
-static void PrintHelp()
+static void PrintHelp(void)
 {
   Print("# Help");
   Print("%s - A fast prime number generator", NAME);
   Print("> fast_primes_ll [OPTION]... [PARAM]...");
-  Print("> fast_primes_ll -nthPrime 10001");
-  Print("");
+  Print("> fast_primes_ll -nthPrime 10001\n");
 
   Print("## Commands");
   Print("-help          This help");
@@ -266,9 +265,8 @@ static void PrintHelp()
   Print("-bench         Run benchmarks");
   Print("-hash          Show hash information");
   Print("-isPrime  [N]  See if N is a prime");
-  Print("-nthPrime [N]  Show Nth prime");
-  Print("-primes   [N]  Show all primes up to N");
-  Print("");
+  Print("-nthPrime [N]  Show N:th prime");
+  Print("-primes   [N]  Show all primes up to N\n");
 
   Print("## Full source code, please see:");
   Print("  <https://github.com/SamuraiDangyo/fast_primes_ll/>");
@@ -276,7 +274,7 @@ static void PrintHelp()
   exit(EXIT_SUCCESS);
 }
 
-static void CommandIsPrime()
+static void CommandIsPrime(void)
 {
   const int num        = TokenNextInt();
   const BITBOARD start = Now();
@@ -305,7 +303,7 @@ static BITBOARD NthPrime(const int prime_n)
   return PRIMES.primes[nth];
 }
 
-static void CommandNthPrime()
+static void CommandNthPrime(void)
 {
   const int nth        = Max(0, TokenNextInt());
   const BITBOARD start = Now();
@@ -315,7 +313,7 @@ static void CommandNthPrime()
   Print("Time:   %.3fs", 0.001 * DOUBLE(Now() - start));
 }
 
-static void CommandPrimes()
+static void CommandPrimes(void)
 {
   const int num = Max(2, TokenNextInt());
 
@@ -374,12 +372,12 @@ static bool IsPrime(const BITBOARD maybe_prime)
   return 0;
 }
 
-static int LastPrime()
+static int LastPrime(void)
 {
   return PRIMES.primes[PRIMES.primes_n - 1];
 }
 
-static int NextPrime()
+static inline int NextPrime(void)
 {
   int candidate = LastPrime() + 1;
 
@@ -400,7 +398,7 @@ static void InsertPrimes(const int how_many)
   }
 }
 
-static void InitPrimes()
+static void InitPrimes(void)
 {
   int i;
 
@@ -413,7 +411,7 @@ static void InitPrimes()
     AddPrime(NextPrime());
 }
 
-static void Bench()
+static void Bench(void)
 {
   BITBOARD diff;
   const BITBOARD start = Now();
@@ -448,7 +446,7 @@ static void PrintPrimes(const int usize)
     Print("%llu", PRIMES.primes[i]);
 }
 
-static void Commands()
+static void Commands(void)
 {
   TokenExpect(";");
 
@@ -483,7 +481,7 @@ static void InitTokens(int argc, char **argv)
   TokenAdd(";");
 }
 
-static void Yeah()
+static void Yeah(void)
 {
   MYASSERT((IsPrime(37)));
   MYASSERT((IsPrime(53)));
@@ -497,7 +495,7 @@ static void Yeah()
   MYASSERT((NthPrime(34) == 139));
 }
 
-static void Nope()
+static void Nope(void)
 {
   MYASSERT(( ! IsPrime(42)));
   MYASSERT(( ! IsPrime(55)));
@@ -506,7 +504,7 @@ static void Nope()
   MYASSERT((NthPrime(1) != 7));
 }
 
-static void Go()
+static void Go(void)
 {
   PrimestableSetSize(HASH_SIZE);
   InitPrimes();
