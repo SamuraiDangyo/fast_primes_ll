@@ -1,3 +1,5 @@
+![fast_primes_ll](https://github.com/SamuraiDangyo/fast_primes_ll/blob/master/logo.png)
+
 ## fast_primes_ll
 A fast prime number generator written in C Language
 
