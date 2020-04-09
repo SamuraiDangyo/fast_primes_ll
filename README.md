@@ -15,12 +15,7 @@ fast_primes_ll -help
 ```
 
 ```
-# Makefile help for compiling :
-make help
-```
-
-```
-# See also source code :
+# See also the source code :
 fast_primes_ll.c
 ```
 
