@@ -1,7 +1,7 @@
-# fast_primes_ll
-A fast prime number generator written in C Language
-
 ![fast_primes_ll](https://github.com/SamuraiDangyo/fast_primes_ll/blob/master/logo.png)
+
+# Overview
+fast_primes_ll is a fast prime number generator written in C++ Language
 
 ## Install
 ```
@@ -16,7 +16,7 @@ fast_primes_ll -help
 
 ```
 # See also the source code :
-fast_primes_ll.c
+fast_primes_ll.cpp
 ```
 
 ## Examples

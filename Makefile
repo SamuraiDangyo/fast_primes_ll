@@ -1,10 +1,10 @@
 INSTALLDIR=/usr/bin/
 
-# [gcc, g++, clang, clang++]
-CC=gcc
+# [g++, clang++, ...]
+CC=g++
 
 all:
-	$(CC) -Wall -O2 fast_primes_ll.c -o fast_primes_ll
+	$(CC) -g -Wall -O2 fast_primes_ll.cpp -o fast_primes_ll
 
 clean:
 	rm -f fast_primes_ll
