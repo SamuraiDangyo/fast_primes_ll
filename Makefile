@@ -1,6 +1,6 @@
 INSTALLDIR=/usr/bin/
 
-# [g++, clang++, ...]
+# [g++, clang++ ...]
 CC=g++
 
 all:
