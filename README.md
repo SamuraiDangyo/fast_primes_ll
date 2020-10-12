@@ -4,35 +4,16 @@
 fast_primes_ll is a fast prime number generator written in C++ Language
 
 ## Install
-```
-make clean all strip install
-```
+`make` should build a good binary,
 
-## Help
+## Example.1 : Find out what's the 10,001st prime ?
 ```
-# Main help :
-fast_primes_ll -help
-```
-
-```
-# See also the source code :
-fast_primes_ll.cpp
-```
-
-## Examples
-```
-# Find out what's the 10,001st prime ?
 fast_primes_ll -nthPrime 10001
 ```
 
+## Example.2 : Is 42 a prime number ?
 ```
-# Is 42 a prime number ?
 fast_primes_ll -isPrime 42
-```
-
-```
-First 42 primes !
-fast_primes_ll -primes 42
 ```
 
 ## License

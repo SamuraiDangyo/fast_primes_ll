@@ -1,19 +1,14 @@
-INSTALLDIR=/usr/bin/
-
-# [g++, clang++ ...]
-CC=g++
-
 all:
-	$(CC) -g -Wall -O2 fast_primes_ll.cpp -o fast_primes_ll
+	clang++ -g -Wall -O2 main.cpp -o fast_primes_ll
 
 clean:
-	rm -f fast_primes_ll
+	rm -f main
 
 strip:
-	strip fast_primes_ll
+	strip main
 
-install:
-	if [ -d $(INSTALLDIR) ]; then sudo cp -f fast_primes_ll $(INSTALLDIR); fi
+install: all strip
+	if [ -d $(INSTALLDIR) ]; then sudo cp -f main /usr/bin/; fi
 
 bench:
 	./fast_primes_ll -bench
