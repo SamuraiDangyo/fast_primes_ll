@@ -1,5 +1,5 @@
 /*
-fast_primes_ll is a fast prime number generator written in C++ Language
+fast_primes_ll. Fast prime number generator written in C++14 Language
 Copyright (C) 2019-2020 Toni Helminen
 
 This program is free software: you can redistribute it and/or modify
@@ -22,148 +22,153 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Headers
 
-#include <inttypes.h>
 #include <vector>
 #include <iostream>
 #include <string>
-#include <assert.h>
 
 // Namespace
 
-namespace fastprimesll {
+namespace fast_primes_ll {
 
 // Consts
 
-const std::string k_name = "fast_primes_ll 1.39";
+const std::string kName = "fast_primes_ll 1.5";
 
 // Variables
 
-std::vector<uint64_t> h_primes = {2, 3, 5};
+std::vector<std::uint64_t> g_primes = {2, 3, 5};
 
 // Prototypes
 
-long NextPrime();
-void InsertPrimes(const long);
-void PrintPrimes(const long);
-bool IsPrime(const uint64_t);
+long next_prime();
+void insert_primes(const long);
+void print_primes(const long);
+bool is_prime(const std::uint64_t);
 
 // Functions
 
-void PrintHelp() {
-  std::cout << ":~: Help :~:\n" << std::endl;
-  std::cout << k_name << " by Toni Helminen" << std::endl;
-  std::cout << "> fast_primes_ll -nthPrime=10001\n" << std::endl;
-  std::cout << "## Commands" << std::endl;
-  std::cout << "--help        This help" << std::endl;
-  std::cout << "--version     Show version" << std::endl;
-  std::cout << "--bench       Run benchmarks" << std::endl;
-  std::cout << "--unittests   Run unittests" << std::endl;
-  std::cout << "-isPrime=[N]  See if N is a prime" << std::endl;
-  std::cout << "-nthPrime=[N] Show N:th prime" << std::endl;
-  std::cout << "-primes=[N]   Show all primes up to N\n" << std::endl;
-  std::cout << "Full source code, please see: <https://github.com/SamuraiDangyo/fast_primes_ll/>" << std::endl;
-}
-
-void CommandIsPrime(const long num) {
-  if (IsPrime(num))
+void command_is_prime(const long num) {
+  if (is_prime(num))
     std::cout << "Yes, " << num << " is a prime number" << std::endl;
   else
     std::cout << "No, " << num << " is not a prime number" << std::endl;
 }
 
-uint64_t NthPrime(const long prime_n) {
+std::uint64_t nth_prime(const long prime_n) {
   const long nth = prime_n > 0 ? prime_n - 1 : 0;
-  if (prime_n <= 0) return 2;
-  if (nth < h_primes.size()) return h_primes[nth];
-  while (h_primes.size() <= nth) h_primes.push_back(NextPrime());
-  return h_primes[nth];
+
+  if (prime_n <= 0) 
+    return 2;
+
+  if (nth < g_primes.size()) 
+    return g_primes[nth];
+
+  while (g_primes.size() <= nth) 
+    g_primes.push_back(next_prime());
+
+  return g_primes[nth];
 }
 
-void CommandPrimes(long num) {
-  if (num <= 0) {std::cout << "-" << std::endl; return;}
-  PrintPrimes(num);
-  InsertPrimes(num);
-}
-
-bool IsPrimeNogen(const uint64_t prime) {
-  if (prime < 2) return 1;
-  for (size_t i = 0; i < h_primes.size() && h_primes[i] * h_primes[i] <= prime; i++) if (prime % h_primes[i] == 0) return 0;
-  return 1;
-}
-
-bool IsPrime(const uint64_t maybe_prime) {
-  if (maybe_prime <= 1) return 0;
-  for (size_t i = 0; i < h_primes.size(); i++) if (h_primes[i] == maybe_prime) return 1;
-  while (1) {
-    const uint64_t prime = NextPrime();
-    h_primes.push_back(prime);
-    if (prime == maybe_prime) return 1;
-    if (prime > maybe_prime) return 0;
+void command_primes(long num) {
+  if (num <= 0) {
+    std::cout << "-" << std::endl; 
+    return;
   }
-  return 0;
+
+  print_primes(num);
+  insert_primes(num);
 }
 
-long NextPrime() {
-  long candidate = h_primes.back() + 1;
-  while (1) if (IsPrimeNogen(candidate)) return candidate; else candidate++;
-  assert(0);
+bool is_prime_gen(const std::uint64_t prime) {
+  if (prime < 2) 
+    return true;
+
+  for (std::size_t i = 0; i < g_primes.size() && g_primes[i] * g_primes[i] <= prime; i++) 
+    if (prime % g_primes[i] == 0) 
+      return false;
+  return true;
 }
 
-void InsertPrimes(const long how_many) {
-  while (h_primes.size() < how_many) {
-    h_primes.push_back(NextPrime());
-    std::cout << h_primes.back() << std::endl;
+bool is_prime(const std::uint64_t maybe_prime) {
+  if (maybe_prime <= 1) 
+    return false;
+
+  for (std::size_t i = 0; i < g_primes.size(); i++) 
+    if (g_primes[i] == maybe_prime) 
+      return true;
+
+  while (true) {
+    const std::uint64_t prime = next_prime();
+    g_primes.push_back(prime);
+
+    if (prime == maybe_prime) return true;
+    if (prime > maybe_prime ) return false;
+  }
+
+  return false;
+}
+
+void myassert(const bool ok) {
+  if (ok) return;
+
+  std::cerr << "Assert failed" << std::endl;
+  exit(EXIT_FAILURE);
+}
+
+long next_prime() {
+  long candidate = g_primes.back() + 1;
+
+  while (1) 
+    if (is_prime_gen(candidate)) 
+      return candidate; 
+    else 
+      candidate++;
+
+  myassert(false);
+}
+
+void insert_primes(const long how_many) {
+  while (g_primes.size() < how_many) {
+    g_primes.push_back(next_prime());
+    std::cout << g_primes.back() << std::endl;
   }
 }
 
-void Bench() {
+void print_version() {
+  std::cout << kName << " by Toni Helminen" << std::endl;
+}
+
+void print_primes(const long usize) {
+  const long how_many = std::min((long) g_primes.size(), usize);
+
+  for (long i = 0; i < how_many; i++) 
+    std::cout << g_primes[i] << std::endl;
+}
+
+void unittests() {
+  myassert(is_prime(11));
+  myassert(is_prime(2));
+  myassert(is_prime(17));
+}
+
+void bench() {
+  unittests();
+
   const clock_t time = clock();
-  while (h_primes.size() < 1000000) h_primes.push_back(NextPrime());
-  std::cout << "Primes: " << h_primes.size() << std::endl;
+
+  while (g_primes.size() < 1000000) 
+    g_primes.push_back(next_prime());
+
+  std::cout << "Primes: " << g_primes.size() << std::endl;
   std::cout << "Time:   " << (float) (clock() - time) / (float) (CLOCKS_PER_SEC) << std::endl;
 }
 
-void PrintPrimes(const long usize) {
-  const long how_many = std::min((long) h_primes.size(), usize);
-  for (long i = 0; i < how_many; i++) std::cout << h_primes[i] << std::endl;
-}
-
-void Yeah() {
-  assert(IsPrime(37));
-  assert(IsPrime(53));
-  assert(IsPrime(42 + 1));
-  assert(NthPrime(-1) == 2);
-  assert(NthPrime(0)  == 2);
-  assert(NthPrime(1)  == 2);
-  assert(NthPrime(2)  == 3);
-  assert(NthPrime(17) == 59);
-  assert(NthPrime(34) == 139);
-}
-
-void Nope() {
-  assert(!IsPrime(42));
-  assert(!IsPrime(55));
-  assert(!IsPrime(0));
-  assert(NthPrime(1) != 7);
-}
-
-void Unittests() {
-  Yeah();
-  Nope();
-}
-
-// Credit: https://gist.github.com/plasticbox/3708a6cdfbece8cd224487f9ca9794cd
-const std::string getCmdOption(int argc, char *argv[], const std::string& option) {for (int i = 1; i < argc; i++) {const std::string arg = argv[i]; if (arg.find(option) == 0) return arg.substr(option.length());} return "";}
-bool findCmdOption(int argc, char* argv[], const std::string& option) {for (int i = 0; i < argc; i++) {if (option == std::string(argv[i])) return 1;} return 0;}
-
-void Commands(int argc, char **argv) {
-  std::string tmp;
-  if (findCmdOption(argc, argv, "--version")) {std::cout << k_name << std::endl; return;}
-  if (findCmdOption(argc, argv, "--unittests")) {Unittests(); return;}
-  if (findCmdOption(argc, argv, "--bench")) {Bench(); return;}
-  tmp = getCmdOption(argc, argv, "-isPrime=") ; if (tmp != "") {CommandIsPrime(std::stol(tmp)); return;}
-  tmp = getCmdOption(argc, argv, "-nthPrime="); if (tmp != "") {std::cout << NthPrime(std::stol(tmp)) << std::endl; return;}
-  tmp = getCmdOption(argc, argv, "-primes="); if (tmp != "") {CommandPrimes(std::stol(tmp)); return;} // apdnarguoyevoli
-  if (argc >= 2 && !findCmdOption(argc, argv, "--help")) {std::cout << "Invalid command: '" << std::string(argv[1]) << "'" << std::endl; return;}
-  PrintHelp();
+void print_help() {
+  std::cout << "> fast_primes_ll -nthprime 10001" << std::endl;
+  std::cout << "--help        This help" << std::endl;
+  std::cout << "--version     Show version" << std::endl;
+  std::cout << "--bench       Run benchmarks" << std::endl;
+  std::cout << "-isprime [N]  See if N is a prime" << std::endl;
+  std::cout << "-nthprime [N] Show N:th prime" << std::endl;
+  std::cout << "-primes [N]   Show all primes up to N" << std::endl;
 }}

@@ -4,13 +4,7 @@ all:
 clean:
 	rm -f main
 
-strip:
-	strip main
-
-install: all strip
+install:
 	if [ -d $(INSTALLDIR) ]; then sudo cp -f main /usr/bin/; fi
 
-bench:
-	./fast_primes_ll -bench
-
-.PHONY: all strip clean install bench
+.PHONY: all clean install
