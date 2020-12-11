@@ -41,8 +41,8 @@ std::vector<std::uint64_t> g_primes = {2, 3, 5};
 // Prototypes
 
 long next_prime();
-void insert_primes(const long);
-void print_primes(const long);
+void insert_primes(const std::size_t);
+void print_primes(const std::size_t);
 bool is_prime(const std::uint64_t);
 
 // Functions
@@ -55,7 +55,7 @@ void command_is_prime(const long num) {
 }
 
 std::uint64_t nth_prime(const long prime_n) {
-  const long nth = prime_n > 0 ? prime_n - 1 : 0;
+  const std::size_t nth = prime_n > 0 ? prime_n - 1 : 0;
 
   if (prime_n <= 0) 
     return 2;
@@ -127,7 +127,7 @@ long next_prime() {
   myassert(false);
 }
 
-void insert_primes(const long how_many) {
+void insert_primes(const std::size_t how_many) {
   while (g_primes.size() < how_many) {
     g_primes.push_back(next_prime());
     std::cout << g_primes.back() << std::endl;
@@ -138,8 +138,8 @@ void print_version() {
   std::cout << kName << " by Toni Helminen" << std::endl;
 }
 
-void print_primes(const long usize) {
-  const long how_many = std::min((long) g_primes.size(), usize);
+void print_primes(const std::size_t usize) {
+  const long how_many = std::min(g_primes.size(), usize);
 
   for (long i = 0; i < how_many; i++) 
     std::cout << g_primes[i] << std::endl;

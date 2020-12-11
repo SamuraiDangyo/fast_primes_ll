@@ -1,10 +1,10 @@
 all:
-	clang++ -g -Wall -O2 main.cpp -o fast_primes_ll
+	$(CXX) -g -Wall -O2 $(CXXFLAGS) main.cpp -o fast_primes_ll
 
 clean:
-	rm -f main
+	rm -f fast_primes_ll
 
 install:
-	if [ -d $(INSTALLDIR) ]; then sudo cp -f main /usr/bin/; fi
+	if [ -d $(INSTALLDIR) ]; then sudo cp -f fast_primes_ll /usr/bin/; fi
 
 .PHONY: all clean install
